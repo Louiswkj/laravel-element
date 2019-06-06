@@ -21,11 +21,6 @@ window.Vue = require('vue');
 import App from './App.vue';
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
-import http from './util/http.js' // http fetch function
-
-const __Prototype = Vue.prototype;
-
-__Prototype.$http = http;
 
 Vue.use(ElementUI);
 

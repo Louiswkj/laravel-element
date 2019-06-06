@@ -180,9 +180,12 @@
 </template>
 
 <script>
+    import Q from './common/index'
+    import base from './pages/base'
     const g_dd_appid = 'dingding_appid';
     const g_redirect_uri = 'https://' + document.domain + '/login/ddlogin';
     export default {
+        mixins: [base],
         name: 'app',
         mounted() {
             this.userInfo = JSON.parse(window.sessionStorage.getItem('userInfo'));
@@ -278,31 +281,39 @@
                 }
             },
             routeChange(path) {
-                this.$http.post('/api/rule/get-path-info', {path: path}).then(res => {
-                    if (res.status === 100) {
-                        this.navBre = res.data;
-                        this.defaultTopIndex = this.navBre[0].id + '';
-                        for (let index in this.menus) {
-                            if (this.menus[index].id === Number(this.defaultTopIndex)) {
-                                this.leftMenus = this.menus[index].children;
-                                break;
-                            }
-                        }
-                        this.active = this.navBre[1].id + '-' + this.navBre[2].id;
+                this.$ajax({
+                    type: 'POST',
+                    url: '/api/rule/get-path-info',
+                    data: {path: path},
+                    fail: e => {
+                        this.error = Q.formatError(e)
                     }
+                }).then(data => {
+                    this.navBre = data;
+                    this.defaultTopIndex = this.navBre[0].id + '';
+                    for (let index in this.menus) {
+                        if (this.menus[index].id === Number(this.defaultTopIndex)) {
+                            this.leftMenus = this.menus[index].children;
+                            break;
+                        }
+                    }
+                    this.active = this.navBre[1].id + '-' + this.navBre[2].id;
                 });
             },
             login(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        this.$http.post('/api/login/login', this.form).then(res => {
-                            if (res.status === 100) {
-                                window.sessionStorage.setItem('userInfo', JSON.stringify(res.data));
-                                window.location.href='/#/admin/system/profile';
-                                location.reload();
-                            } else {
-                                this.error = res.message;
+                        this.$ajax({
+                            type: 'POST',
+                            url: '/api/login/login',
+                            data: this.form,
+                            fail: e => {
+                                this.error = Q.formatError(e)
                             }
+                        }).then(data => {
+                            window.sessionStorage.setItem('userInfo', JSON.stringify(data));
+                            window.location.href='/#/admin/system/profile';
+                            location.reload();
                         });
                     }
                 });
@@ -316,13 +327,16 @@
             },
 
             logout() {
-                this.$http.post('/api/login/logout', this.form).then(res => {
-                    if (res.status === 100) {
-                        window.sessionStorage.removeItem('userInfo');
-                        window.location.href='/';
-                    } else {
-                        this.error = res.msg;
+                this.$ajax({
+                    type: 'POST',
+                    url: '/api/login/logout',
+                    data: this.form,
+                    fail: e => {
+                        this.error = Q.formatError(e)
                     }
+                }).then(data => {
+                    window.sessionStorage.removeItem('userInfo');
+                    window.location.href='/';
                 });
             },
 

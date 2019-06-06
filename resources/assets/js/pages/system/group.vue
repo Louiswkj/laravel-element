@@ -31,7 +31,7 @@
                     label="操作"
                     width="100">
                 <template slot-scope="scope">
-                    <el-button type="text" size="small" v-if="scope.row.id != 1 " @click="editGroup(scope.row)">编辑</el-button>
+                    <el-button type="primary" icon="el-icon-edit" v-if="scope.row.id != 1 " circle @click="editGroup(scope.row)"></el-button>
                 </template>
             </el-table-column>
         </el-table>

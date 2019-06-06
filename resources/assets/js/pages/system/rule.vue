@@ -97,12 +97,10 @@
 
     import Q from '../../common/index'
     import base from '../../pages/base'
-    import AjaxButton from '../../components/ajax-button'
-
 
     export default {
         mixins: [base],
-        components: { Treeselect , AjaxButton},
+        components: { Treeselect },
         watch: {
             filterNodeText(val) {
                 this.$refs.tree.filter(val);
@@ -186,11 +184,18 @@
             },
 
             getRoutes() {
-                this.$http.get('/api/rule/get-all-routes', this.form).then(res => {
-                    this.routes = res.data.map(function (item) {
+                this.$ajax({
+                    type: 'GET',
+                    url: '/api/rule/get-all-routes',
+                    data: this.form,
+                    fail: e => {
+                        this.error = Q.formatError(e)
+                    }
+                }).then(data => {
+                    this.routes = data.map(function (item) {
                         return {value:item};
                     });
-                });
+                })
             },
             getMenusTree() {
                 this.$ajax({

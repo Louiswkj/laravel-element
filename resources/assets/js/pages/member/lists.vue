@@ -210,7 +210,11 @@
 </template>
 
 <script>
+
+    import Q from '../../common/index'
+    import base from '../../pages/base'
     export default {
+        mixins: [base],
         mounted() {
             this.getList();
         },
@@ -243,19 +247,31 @@
 
             getDetail(id) {
                 this.addNewDialog = true;
-                console.log('id',id)
-                this.$http.get('/api/member/detail', {id:id}).then(res => {
-                    this.detail = res.data || {};
+                this.$ajax({
+                    type: 'GET',
+                    url: '/api/member/detail',
+                    data: {id:id},
+                    fail: e => {
+                        this.error = Q.formatError(e)
+                    }
+                }).then(data => {
+                    this.detail = data || {};
                 });
             },
 
             getList() {
-                this.$http.get('/api/member/lists', this.form).then(res => {
-                    this.tableData = res.data.data;
-                    this.totalItems = res.data.total;
-                    this.auth = res.data.auth;
+                this.$ajax({
+                    type: 'GET',
+                    url: '/api/member/lists',
+                    data: this.form,
+                    fail: e => {
+                        this.error = Q.formatError(e)
+                    }
+                }).then(data => {
+                    this.tableData = data.data;
+                    this.totalItems = data.total;
+                    this.auth = data.auth;
 
-                    console.log('this.tableData',this.tableData);
                 });
             },
         }
