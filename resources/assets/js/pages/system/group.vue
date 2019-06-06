@@ -67,6 +67,7 @@
 </template>
 
 <script>
+    import Q from '../../common/index'
     import base from '../../pages/base'
     export default {
         mixins: [base],
@@ -117,19 +118,12 @@
                                 this.error = Q.formatError(e)
                             }
                         }).then(data => {
-                            if(data.status === 100) {
-                                this.$message({
-                                    message: '保存成功',
-                                    type: 'success'
-                                });
-                                this.addNewDialog = false;
-                                this.getList();
-                            } else {
-                                this.$message({
-                                    message: data.message,
-                                    type: 'error'
-                                });
-                            }
+                            this.$message({
+                                message: '保存成功',
+                                type: 'success'
+                            });
+                            this.addNewDialog = false;
+                            this.getList();
                         });
                     } else {
                         console.log('error submit!!');

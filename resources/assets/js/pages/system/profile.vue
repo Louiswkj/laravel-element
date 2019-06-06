@@ -6,12 +6,12 @@
         </el-alert>
         <br/><br/>
         <el-row>
-            <el-col >
-                <el-form  label-width="100px" style="width: 600px;margin-right: auto;margin-left: auto">
+            <el-col>
+                <el-form label-width="100px" style="width: 600px;margin-right: auto;margin-left: auto">
                     <el-form-item label="上传头像" prop="pass">
                         <ImageInput v-model="imageUrl"
                                     show-raw-size drag
-                                    width="255px" height="auto" ></ImageInput>
+                                    width="255px" height="auto"></ImageInput>
                     </el-form-item>
 
                     <el-form-item>
@@ -27,18 +27,21 @@
         </el-alert>
         <br/><br/>
         <el-row>
-            <el-col >
+            <el-col>
 
                 <el-form :model="saveForm" status-icon :rules="rules" ref="saveForm" label-width="100px"
                          style="width: 600px;margin-right: auto;margin-left: auto">
                     <el-form-item label="原密码" prop="old_password">
-                        <el-input type="password" v-model="saveForm.old_password" style="width: 300px;" autocomplete="off"></el-input>
+                        <el-input type="password" v-model="saveForm.old_password" style="width: 300px;"
+                                  autocomplete="off"></el-input>
                     </el-form-item>
                     <el-form-item label="新密码" prop="password">
-                        <el-input type="password" v-model="saveForm.password" style="width: 300px;" autocomplete="off"></el-input>
+                        <el-input type="password" v-model="saveForm.password" style="width: 300px;"
+                                  autocomplete="off"></el-input>
                     </el-form-item>
                     <el-form-item label="确认密码" prop="check_password">
-                        <el-input type="password" v-model="saveForm.check_password" style="width: 300px;" autocomplete="off"></el-input>
+                        <el-input type="password" v-model="saveForm.check_password" style="width: 300px;"
+                                  autocomplete="off"></el-input>
                     </el-form-item>
 
                     <el-form-item>
@@ -52,20 +55,23 @@
 </template>
 
 <script>
+    import Q from '../../common/index'
+    import base from '../../pages/base'
     import ImageInput from '../../components/image-input'
 
     export default {
+        mixins: [base],
         mounted() {
             this.getProfile();
         },
-        components:{
+        components: {
             ImageInput
         },
         data() {
             const validatePass = (rule, value, callback) => {
                 if (value === '') {
                     callback(new Error('请输入密码'));
-                } else if(value.length < 6) {
+                } else if (value.length < 6) {
                     callback(new Error('密码不能少于6位'));
                 }
                 else {
@@ -76,51 +82,51 @@
                 }
             };
             const validatePass2 = (rule, value, callback) => {
-                    if (value === '') {
-                        callback(new Error('请再次输入密码'));
-                    } else if (value !== this.saveForm.password) {
-                        callback(new Error('两次输入密码不一致!'));
-                    } else {
-                        callback();
-                    }
+                if (value === '') {
+                    callback(new Error('请再次输入密码'));
+                } else if (value !== this.saveForm.password) {
+                    callback(new Error('两次输入密码不一致!'));
+                } else {
+                    callback();
+                }
             };
 
             return {
                 saveForm: {
-                    old_password:'',
-                    check_password:'',
-                    password:''
+                    old_password: '',
+                    check_password: '',
+                    password: ''
                 },
                 rules: {
                     old_password: [
-                        { required:true,  message: '请输入原密码', trigger: 'blur' }
+                        {required: true, message: '请输入原密码', trigger: 'blur'}
                     ],
                     password: [
-                        { validator: validatePass, trigger: 'blur' }
+                        {validator: validatePass, trigger: 'blur'}
                     ],
                     check_password: [
-                        { validator: validatePass2, trigger: 'blur' }
+                        {validator: validatePass2, trigger: 'blur'}
                     ]
                 },
                 imageUrl: ''
             }
         },
-        methods:{
+        methods: {
             onSubmit(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        this.$http.post('/api/admin/change-password', this.saveForm).then(res => {
-                            if(res.status === 100) {
-                                this.$message({
-                                    message: '保存成功',
-                                    type: 'success'
-                                });
-                            } else {
-                                this.$message({
-                                    message: res.message,
-                                    type: 'error'
-                                });
+                        this.$ajax({
+                            type: 'POST',
+                            url: '/api/admin/change-password',
+                            data: this.saveForm,
+                            fail: e => {
+                                this.error = Q.formatError(e)
                             }
+                        }).then(data => {
+                            this.$message({
+                                message: '保存成功',
+                                type: 'success'
+                            });
                         });
                     } else {
                         console.log('error submit!!');
@@ -130,34 +136,39 @@
 
             },
             getProfile() {
-                this.$http.get('/api/admin/get-profile', {}).then(res => {
-                    if(res.status === 100) {
-                        this.imageUrl = res.data.avatar;
+                this.$ajax({
+                    type: 'GET',
+                    url: '/api/admin/get-profile',
+                    data: {},
+                    fail: e => {
+                        this.error = Q.formatError(e)
                     }
-                });
+                }).then(data => {
+                    this.imageUrl = data.avatar || '';
+                })
             },
 
             saveAvatar() {
-                if(!this.imageUrl) {
+                if (!this.imageUrl) {
                     this.$message.error('请上传头像！');
                     return false;
                 }
 
-                this.$http.post('/api/admin/save-avatar', {avatar: this.imageUrl}).then(res => {
-                    if(res.status === 100) {
-                        this.$message({
-                            message: '保存成功',
-                            type: 'success'
-                        });
-
-                    } else {
-                        this.$message({
-                            message: res.msg,
-                            type: 'error'
-                        });
+                this.$ajax({
+                    type: 'POST',
+                    url: '/api/admin/save-avatar',
+                    data: {
+                        avatar: this.imageUrl,
+                    },
+                    fail: e => {
+                        this.error = Q.formatError(e)
                     }
-                });
-
+                }).then(data => {
+                    this.$message({
+                        message: '保存成功',
+                        type: 'success'
+                    });
+                })
             },
 
             resetForm(formName) {
@@ -179,9 +190,11 @@
         position: relative;
         overflow: hidden;
     }
+
     .avatar-uploader .el-upload:hover {
         border-color: #409EFF;
     }
+
     .avatar-uploader-icon {
         font-size: 28px;
         color: #8c939d;
@@ -190,6 +203,7 @@
         line-height: 178px;
         text-align: center;
     }
+
     .avatar {
         width: 178px;
         height: 178px;

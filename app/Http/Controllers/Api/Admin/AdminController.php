@@ -25,7 +25,7 @@ class AdminController extends BaseController
      */
     public function getList()
     {
-        $data = Admin::getInstance()->getList(Input::all());
+        $data = Admin::getInstance()->getList(Input::all(),Input::get('pageSize'));
 
         return $this->success($data);
     }
@@ -35,7 +35,7 @@ class AdminController extends BaseController
      */
     public function getLogs()
     {
-        $data = SystemLogs::getInstance()->getList(Input::all());
+        $data = SystemLogs::getInstance()->getList(Input::all(),Input::get(('pageSize')));
         return $this->success($data);
     }
 
@@ -105,5 +105,11 @@ class AdminController extends BaseController
     public function setLoginInfo()
     {
         $this->loginInfo = session('loginInfo');
+    }
+
+    public function delete()
+    {
+        Admin::getInstance()->deleteRow(Input::get('id'));
+        return $this->success();
     }
 }

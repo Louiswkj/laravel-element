@@ -41,7 +41,10 @@
 </template>
 
 <script>
+    import Q from '../../common/index'
+    import base from '../../pages/base'
     export default {
+        mixins: [base],
         mounted() {
             this.getList();
         },
@@ -62,9 +65,16 @@
             },
 
             getList() {
-                this.$http.get('/api/admin/get-logs', this.form).then(res => {
-                    this.tableData = res.data.data;
-                    this.totalItems = res.data.total;
+                this.$ajax({
+                    type : 'GET',
+                    url : '/api/admin/get-logs',
+                    data :this.form,
+                    fail: e => {
+                        this.error = Q.formatError(e)
+                    }
+                }).then(data => {
+                    this.tableData = data.data || {};
+                    this.totalItems = data.total || 0;
                 });
             },
             handleSizeChange(size) {

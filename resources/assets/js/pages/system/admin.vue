@@ -48,9 +48,10 @@
             <el-table-column
                     fixed="right"
                     label="操作"
-                    width="100">
+                    width="120">
                 <template slot-scope="scope">
-                    <el-button type="text" size="small"  @click="editRow(scope.row)">编辑</el-button>
+                    <el-button type="primary" icon="el-icon-edit" circle @click="editRow(scope.row)"></el-button>
+                    <el-button type="danger" icon="el-icon-delete" circle @click="deleteRow(scope.row)" v-if="scope.row.id != 1"></el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -191,19 +192,12 @@
                                 this.error = Q.formatError(e)
                             }
                         }).then(data => {
-                            if(data.status === 100) {
-                                this.$message({
-                                    message: '保存成功',
-                                    type: 'success'
-                                });
-                                this.addNewDialog = false ;
-                                this.getList();
-                            }else{
-                                this.$message({
-                                    message: data.message,
-                                    type: 'error'
-                                });
-                            }
+                            this.$message({
+                                message: '保存成功',
+                                type: 'success'
+                            });
+                            this.addNewDialog = false ;
+                            this.getList();
                         });
                     } else {
                         console.log('error submit!!');
@@ -269,6 +263,30 @@
                     status:row.status === 1,
                 };
             },
+            deleteRow(node) {
+                this.$confirm('你确定删除这条记录吗?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.$ajax({
+                        type: 'POST',
+                        url: '/api/admin/delete',
+                        data: {
+                            id:node.id
+                        },
+                        fail: e => {
+                            this.error = Q.formatError(e)
+                        }
+                    }).then(data => {
+                        this.$message({
+                            message: '删除成功',
+                            type: 'success'
+                        });
+                        this.getList();
+                    })
+                });
+            }
         }
     }
 </script>

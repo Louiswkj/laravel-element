@@ -25,7 +25,10 @@
                     </el-form-item>
 
                     <el-form-item label="状态" prop="status" >
-                        <el-switch v-model="saveForm.status" active-text="开启" inactive-text="关闭"></el-switch>
+                        <el-radio-group v-model="saveForm.status">
+                            <el-radio  label="1">开启</el-radio>
+                            <el-radio  label="0" >关闭</el-radio>
+                        </el-radio-group>
                     </el-form-item>
                     <el-form-item label="父级菜单" prop="pid">
                         <treeselect v-model="saveForm.pid" :multiple="false"
@@ -92,8 +95,14 @@
     // import the styles
     import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 
+    import Q from '../../common/index'
+    import base from '../../pages/base'
+    import AjaxButton from '../../components/ajax-button'
+
+
     export default {
-        components: { Treeselect },
+        mixins: [base],
+        components: { Treeselect , AjaxButton},
         watch: {
             filterNodeText(val) {
                 this.$refs.tree.filter(val);
@@ -112,7 +121,7 @@
                 saveForm:{
                     title:'',
                     name:'',
-                    status:true,
+                    status:"1",
                     menu:"0"
                 },
                 menusTree:[],
@@ -136,21 +145,20 @@
             onSubmit() {
                 this.$refs['saveForm'].validate((valid) => {
                     if (valid) {
-                        this.$http.post('/api/rule/save', this.saveForm).then(res => {
-                            if(res.status === 100) {
-                                this.$message({
-                                    message: '保存成功',
-                                    type: 'success'
-                                });
-                                this.addNewDialog = false;
-                                this.getRulesTree();
-                                this.getMenusTree();
-                            } else {
-                                this.$message({
-                                    message: res.msg,
-                                    type: 'error'
-                                });
+                        this.$ajax({
+                            type: 'POST',
+                            url: '/api/rule/save',
+                            data: this.saveForm,
+                            fail: e => {
+                                this.error = Q.formatError(e)
                             }
+                        }).then(data => {
+                            this.$message({
+                                message: '保存成功',
+                                type: 'success'
+                            });
+                            this.getRulesTree();
+                            this.getMenusTree();
                         });
                     } else {
                         console.log('error submit!!');
@@ -185,13 +193,30 @@
                 });
             },
             getMenusTree() {
-                this.$http.get('/api/rule/get-tree-list',{menu:1, status:1}).then(res => {
-                    this.menusTree = res.data.list;
-                });
+                this.$ajax({
+                    type: 'GET',
+                    url: '/api/rule/get-tree-list',
+                    data: {
+                        menu:1,
+                        status:1
+                    },
+                    fail: e => {
+                        this.error = Q.formatError(e)
+                    }
+                }).then(data => {
+                    this.menusTree = data.list;
+                })
             },
             getRulesTree() {
-                this.$http.get('/api/rule/get-tree-list',{}).then(res => {
-                    this.rulesTree = res.data.list;
+                this.$ajax({
+                    type: 'GET',
+                    url: '/api/rule/get-tree-list',
+                    data: {},
+                    fail: e => {
+                        this.error = Q.formatError(e)
+                    }
+                }).then(data => {
+                    this.rulesTree = data.list;
                     this.rulesTree.map(row => {
                         this.expandKeys.push(row.id);
                         for(let index in row.children) {
@@ -199,8 +224,8 @@
                         }
                         return row;
                     });
-                    this.auth = res.data.auth;
-                });
+                    this.auth = data.auth;
+                })
             },
             resetFields() {
                 if(typeof(this.$refs['saveForm']) !== 'undefined') this.$refs['saveForm'].resetFields();
@@ -209,12 +234,21 @@
             editRule(node) {
                 if(typeof(this.$refs['saveForm']) !== 'undefined') this.$refs['saveForm'].resetFields();
 
-                this.$http.get('/api/rule/get',{id:node.id}).then(res => {
-                    this.saveForm = res.data;
-                    this.saveForm.status = res.data.status === 1;
+                this.$ajax({
+                    type: 'GET',
+                    url: '/api/rule/get',
+                    data: {
+                        id:node.id
+                    },
+                    fail: e => {
+                        this.error = Q.formatError(e)
+                    }
+                }).then(data => {
+                    this.saveForm = data;
+                    this.saveForm.status += '';
                     this.saveForm.menu += '';
                     this.saveForm.pid = this.saveForm.pid ? this.saveForm.pid : undefined;
-                });
+                })
             },
             deleteRule(node) {
                 this.$confirm('你确定删除这条记录吗?', '提示', {
@@ -222,12 +256,24 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    this.$http.post('/api/rule/delete',{id:node.id}).then(res => {
+                    this.$ajax({
+                        type: 'POST',
+                        url: '/api/rule/delete',
+                        data: {
+                            id:node.id
+                        },
+                        fail: e => {
+                            this.error = Q.formatError(e)
+                        }
+                    }).then(data => {
+                        this.$message({
+                            message: '删除成功',
+                            type: 'success'
+                        });
                         this.getRulesTree();
                         this.getMenusTree();
-                    });
+                    })
                 });
-
             }
         }
     }

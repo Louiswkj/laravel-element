@@ -64,7 +64,6 @@ export default function ajax (options) {
         console.warn('executing ajax: ', options)
     }
 
-        // 补充公共参数
     if (options.type === 'GET') {
         if (!options.params && options.data) {
             options.params = options.data
@@ -74,6 +73,7 @@ export default function ajax (options) {
         options.params = extend(commonParams, options.params || {})
         fixOssParams(options.params, options.url)
     } else {
+        commonParams['_token'] = $('meta[name="csrf-token"]').attr('content');
         if (!options.data || isPlainObject(options.data)) {
             options.data = extend(commonParams, options.data || {})
             fixOssParams(options.data, options.url)

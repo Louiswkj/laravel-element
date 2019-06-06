@@ -36,6 +36,14 @@ class Admin extends Model
         return self::$instance;
     }
 
+
+    public function deleteRow($id)
+    {
+        $model = $this->find($id);
+        $model->deleted = 1;
+        $model->save();
+    }
+
     public function getList($condition, $pageSize = 20)
     {
         foreach ($condition as $key => $value) {
@@ -43,6 +51,7 @@ class Admin extends Model
                 unset($condition[$key]);
             }
         }
+        $condition['deleted'] = 0;
 
         $data = $this->where($condition)
             ->orderBy('create_time', 'desc')

@@ -52,7 +52,7 @@ class RuleController extends BaseController
             }
         }
 
-        Rule::getInstance()->saveData(Input::all());
+        Rule::getInstance()->saveData(array_except(Input::all(),'_token'));
 
         return $this->success();
     }
@@ -103,7 +103,7 @@ class RuleController extends BaseController
     public function delete()
     {
         Rule::getInstance()->deleteRow(Input::get('id'));
-        $this->success();
+        return $this->success();
     }
 
 }
