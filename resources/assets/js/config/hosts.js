@@ -1,3 +1,3 @@
 module.exports = {
-    HOST_IMG_MAINAER: 'larvuent.com',
+    HOST_IMG_MAINAER: 'larelement.com',
 }

@@ -18,9 +18,13 @@ use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 
 class UploadController extends Controller
 {
-    protected $allowedOrigins = [
-        'larvuent.com',   // 域名
-    ];
+    protected $allowedOrigins = [];
+
+    public function __construct()
+    {
+        $this->allowedOrigins[] =  env('HOST_IMG_MAINAER','') ;  // 域名
+
+    }
 
     public function index()
     {
@@ -90,5 +94,6 @@ class UploadController extends Controller
 
         return $response;
     }
+
 
 }
