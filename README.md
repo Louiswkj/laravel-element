@@ -12,6 +12,8 @@
 4.  npm install(或cnpm install)
 5.  npm run dev
 
+##参考
+https://github.com/jack15083/laravel-admin
 ## License
 
 The Project is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT).
