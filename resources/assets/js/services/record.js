@@ -1,8 +1,8 @@
 
-import Q from '@/common'
-import ajax from '@/common/ajax'
+import Q from '../common'
+import ajax from '../common/ajax'
 
-import * as auth from '@/services/auth'
+import * as auth from '../services/auth'
 
 
 export function recordClient(){

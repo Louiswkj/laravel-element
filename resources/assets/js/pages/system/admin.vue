@@ -116,7 +116,11 @@
 </template>
 
 <script>
+    import Q from '../../common/index'
+    import base from '../../pages/base'
+
     export default {
+        mixins: [base],
         mounted() {
             this.getList();
             this.getGroupList();
@@ -179,17 +183,24 @@
 
                             return;
                         }
-                        this.$http.post('/api/admin/save', this.saveForm).then(res => {
-                            if(res.status === 100) {
+                        this.$ajax({
+                            type : 'POST',
+                            url : '/api/admin/save',
+                            data :this.saveForm,
+                            fail: e => {
+                                this.error = Q.formatError(e)
+                            }
+                        }).then(data => {
+                            if(data.status === 100) {
                                 this.$message({
                                     message: '保存成功',
                                     type: 'success'
                                 });
-                                this.addNewDialog = false;
+                                this.addNewDialog = false ;
                                 this.getList();
-                            } else {
+                            }else{
                                 this.$message({
-                                    message: res.msg,
+                                    message: data.message,
                                     type: 'error'
                                 });
                             }
@@ -203,17 +214,32 @@
             },
 
             getGroupList() {
-                this.$http.get('/api/group/get-list', {status:1}).then(res => {
-                    this.groups = res.data.list;
+                this.$ajax({
+                    type : 'GET',
+                    url : '/api/group/get-list',
+                    data :{
+                        status:1
+                    },
+                    fail: e => {
+                        this.error = Q.formatError(e)
+                    }
+                }).then(data => {
+                    this.groups = data.list;
                 });
             },
 
             getList() {
-                console.log('this.form',this.form);
-                this.$http.get('/api/admin/get-list', this.form).then(res => {
-                    this.tableData = res.data.data;
-                    this.totalItems = res.data.total;
-                    this.auth = res.data.auth;
+                this.$ajax({
+                    type : 'GET',
+                    url : '/api/admin/get-list',
+                    data :this.form,
+                    fail: e => {
+                        this.error = Q.formatError(e)
+                    }
+                }).then(data => {
+                    this.tableData = data.data;
+                    this.totalItems = data.total;
+                    this.auth = data.auth;
                 });
             },
             handleAdd() {

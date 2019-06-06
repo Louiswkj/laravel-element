@@ -57,7 +57,7 @@ export default function ajax (options) {
     let commonParams = {
         // token: adminToken,
         // admin_token: adminToken,
-        client: 'Admin'
+        // client: 'Admin'
     }
 
     if (!RE_LOGLESS_URLS.test(options.url) && console.warn){

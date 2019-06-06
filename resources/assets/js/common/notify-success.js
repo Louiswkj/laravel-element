@@ -1,4 +1,4 @@
-import bus from '@/services/bus'
+import bus from '../services/bus'
 
 
 export default function (msg, title) {

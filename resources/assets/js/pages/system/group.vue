@@ -67,7 +67,9 @@
 </template>
 
 <script>
+    import base from '../../pages/base'
     export default {
+        mixins: [base],
         mounted() {
             this.getList();
             this.getRulesTree();
@@ -107,8 +109,15 @@
                 
                 this.$refs['saveForm'].validate((valid) => {
                     if (valid) {
-                        this.$http.post('/api/group/save', this.saveForm).then(res => {
-                            if(res.status === 100) {
+                        this.$ajax({
+                            type : 'POST',
+                            url : '/api/group/save',
+                            data :this.saveForm,
+                            fail: e => {
+                                this.error = Q.formatError(e)
+                            }
+                        }).then(data => {
+                            if(data.status === 100) {
                                 this.$message({
                                     message: '保存成功',
                                     type: 'success'
@@ -117,7 +126,7 @@
                                 this.getList();
                             } else {
                                 this.$message({
-                                    message: res.msg,
+                                    message: data.message,
                                     type: 'error'
                                 });
                             }
@@ -130,13 +139,29 @@
             },
 
             getList() {
-                this.$http.get('/api/group/get-list', this.form).then(res => {
-                    this.tableData = res.data.list;
+                this.$ajax({
+                    type : 'GET',
+                    url : '/api/group/get-list',
+                    data :this.form,
+                    fail: e => {
+                        this.error = Q.formatError(e)
+                    }
+                }).then(data => {
+                    this.tableData  = data.list;
                 });
             },
             getRulesTree() {
-                this.$http.get('/api/rule/get-tree-list',{status:1}).then(res => {
-                    this.rulesTree = res.data.list;
+                this.$ajax({
+                    type : 'GET',
+                    url : '/api/rule/get-tree-list',
+                    data :{
+                        status:1
+                    },
+                    fail: e => {
+                        this.error = Q.formatError(e)
+                    }
+                }).then(data => {
+                    this.rulesTree = data.list;
                 });
             },
             handleAdd() {

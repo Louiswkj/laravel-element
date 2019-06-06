@@ -3,8 +3,6 @@ import * as urlUtils from './url-utils'
 import Vue from 'vue'
 import router from '../router'
 import formatError from './format-error'
-import reportError from './report-error'
-import reportMinorError from './report-minor-error'
 import ajax, {get, post, put, request} from './ajax'
 import Cache from './cache'
 import cached from './cached'
@@ -49,10 +47,7 @@ const Q = {
     isListPage (url){
         return url && (typeof url === 'string') && /list(s)?$/i.test(url.replace(/[?#].*$/g, ''))
     },
-    buildQueryString,
     formatError,
-    reportError,
-    reportMinorError,
     notifySuccess,
     registerComponents (components) {
         for (let name in components) {

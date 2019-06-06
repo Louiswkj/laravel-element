@@ -1,7 +1,6 @@
-import bus from '@/services/bus'
+import bus from '../services/bus'
 
 import formatError from './format-error'
-import {onUnauthorized} from './report-error'
 
 export default function (error, innerError) {
     try {
@@ -16,9 +15,6 @@ export default function (error, innerError) {
     
     // 未登录的处理
     const status = +(error && (error.status || error.s)) || +(innerError ? innerError.status || innerError.s : 0)
-    if (status === 104 || status === 10000004) {
-        return onUnauthorized()
-    }
 
     return bus.$notify({
         title: '出了点小问题：',

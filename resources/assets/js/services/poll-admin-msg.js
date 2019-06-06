@@ -1,5 +1,5 @@
 
-import ajax from '@/common/ajax'
+import ajax from '../common/ajax'
 
 var params = {
     vue_mtime: 0,

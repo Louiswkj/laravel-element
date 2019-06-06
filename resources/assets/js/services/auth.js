@@ -2,109 +2,18 @@
  * （后台）认证模块
  */
 
-import bus from './bus'
-import Q from '@/common'
-import cached from '@/common/cached'
-import {LocalCache as Cache} from '@/common/cache'
-import {normalizePath, isPublicPage} from '@/router'
-import {currentCity} from './city'
-import extend from 'extend'
+import cached from '../common/cached'
+import {normalizePath, isPublicPage} from '../router'
 import forEach from 'lodash/each'
-import spyFunc from '@/common/spy-func'
-import dataGet from '@/common/data-get'
-import * as pollAdminMsg from './poll-admin-msg'
+import spyFunc from '../common/spy-func'
+import dataGet from '../common/data-get'
 
 const AUTH_INFO_CACHE_KEY = 'mainaer_admin_auth_info'
 const E_NO_AUTHORIZED = 104
 
-const getAuthInfo = (options) => {
-    return Cache.remember(AUTH_INFO_CACHE_KEY, () => Q.get('/api/admin/auth/info', {city_id: ''}), options)
-                .then(data => {
-                    authInfo = data
-
-                    extend(currentCity, getCurrentCity())
-
-                    return data
-                })
-}
 
 let authInfo = {}
 
-pollAdminMsg.setMsgHandler('auth-updated', () => {
-    console.warn("Auth updated, so do get auth info again.")
-    getAuthInfo({cache: false})
-        .then(() => {
-            bus.$emit('nav-nodes-reload', {reason: 'auth-updated'})
-            loadNavNodesTree({cache: false})
-                        .then(nodesTree => {
-                            bus.$emit('nav-nodes-changed', nodesTree)
-                        })
-        })
-})
-
-export function init (options) {
-    return getAuthInfo(options)
-                .catch(err => {
-                    if (err && +err.status === E_NO_AUTHORIZED) {
-                        if (/login$/.test(location.pathname)) {
-                            authInfo.current_city = err.data.current_city
-                            authInfo.all_cities = err.data.all_cities
-                            extend(currentCity, getCurrentCity())
-
-                            return Promise.resolve({})
-                        } else {
-                            return Q.reportError(err)
-                        }
-                    } else {
-                        throw err
-                    }
-                })
-}
-
-export function login (data) {
-    return Q.post('/admin/login', extend({_isAjax: 1}, data))
-                .then(res => {
-                    authInfo.current_admin_token = res.admin_token
-                    // document.cookie = `admin_token=${res.admin_token};path=/`
-                })
-                .then(() => getAuthInfo({cache: false}))
-}
-
-export function logout () {
-    return Q.post('/api/admin/logout', {admin_token: authInfo.current_admin_token})
-                .then(() => {
-                    Cache.set(AUTH_INFO_CACHE_KEY, null)
-                    location.href = '/admin/login'
-                })
-}
-
-export function isLogin () {
-    return authInfo.current_admin_user && authInfo.current_admin_user.id
-}
-
-export function isNewPage (path) {
-    path = path.replace(/^(\/admin\/)/g, '')
-    if (path === '') {
-        path = 'product/lists'
-    }
-
-    return !isOldPage(path)
-}
-
-export function isOldPage (path) {
-    const oldPages = authInfo.old_pages
-    if (!oldPages){
-        return false
-    }
-
-    for (let pattern of oldPages){
-        if (doesPathMatchPattern(path, pattern)){
-            return true
-        }
-    }
-
-    return false
-}
 
 function doesPathMatchPattern(path, pattern){
     if (path === pattern){
