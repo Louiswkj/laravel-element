@@ -6,12 +6,11 @@
 
 ## 安装步骤
 
-1.  git clone git@github.com:mrzhouxiaofei/Larvuent.git
-2.  composer install
-3.  cp .env.example .env
-4.  php artisan key:generate
-5.  npm install
-6.  npm run dev
+1.  composer install
+2.  cp .env.example .env
+3.  php artisan key:generate
+4.  npm install(或cnpm install)
+5.  npm run dev
 
 ## License
 
