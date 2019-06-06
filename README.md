@@ -12,7 +12,7 @@
 4.  npm install(或cnpm install)
 5.  npm run dev
 
-##参考
+## 参考
 https://github.com/jack15083/laravel-admin
 ## License
 
