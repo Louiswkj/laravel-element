@@ -121,7 +121,7 @@
                         </div>
                     </el-main>
                     <el-footer class="main-footer" style="padding:15px;height: 50px"><strong>Copyright © 2018
-                        <a href="https://github.com/jack15083/laravel-admin">Laravel-Admin</a>.</strong> All rights
+                        <a href="https://github.com/Louiswkj/laravel-element" target="_blank">Laravel-Element</a>.</strong> All rights
                         reserved.
                     </el-footer>
                 </el-container>
