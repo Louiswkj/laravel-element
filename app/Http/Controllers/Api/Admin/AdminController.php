@@ -14,7 +14,6 @@ use App\Helpers\ApiStatus;
 use App\Models\Admin;
 use App\Models\SystemLogs;
 use Clazz\Typed\Illuminate\Support\Facades\Input;
-use Illuminate\Http\Request;
 
 class AdminController extends BaseController
 {
