@@ -4,12 +4,6 @@
     "keywords": ["framework", "laravel"],
     "license": "MIT",
     "type": "project",
-    "repositories": {
-        "mainaer": {
-            "type": "composer",
-            "url": "http://192.168.135.46:3000/mainaer/composer-packages/raw/master/"
-        }
-    },
     "require": {
         "php": ">=7.0.0",
         "clarence/flex-image": "^0.0.9",
